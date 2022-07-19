@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 xmlns:f="http://java.sun.com/jsf/core" 
+                 xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <p:panel id="pnlContent" styleClass="myPanelHoja" header="#{repConsultaContratosBean.navigationJSFManagedBean.nombreOpcion}">
+        <style>
+            .ui-icon.ui-icon-buscar {background-image: url("#{resource['/images/search.png'] }");background-size: 16px 16px;}
+            .ui-icon.ui-icon-button-conso{width: 25px;height: 25px;}
+            .calendario .ui-inputfield {font-size: 8pt;text-transform: uppercase;text-align: center;}
+            .panelgridFiltros{border-collapse:inherit;padding: 0px 0px;}
+            .panelgridFiltros td { border-width: 0px; padding: 0px 3px; font-size: 8pt;background-color: aliceblue}  
+            .estiloEtiqueta{font-weight: bold;color: blue}
+            .estiloPanelelectOneMenuRol .ui-selectonemenu-list,.ui-selectonemenu-table tr {font-size: 9pt;border-color: transparent;text-transform: uppercase}
+            .estiloOneMenuAprob .ui-selectonemenu-label{font-size: 8pt;text-transform: uppercase;width: 150px}
+        </style>
+        <h:form id="formSolic">
+            <p:panelGrid id="pnlCondiciones" columns="12" styleClass="panelgridFiltros" columnClasses="estiloEtiqueta,,,estiloEtiqueta,,,estiloEtiqueta,,,estiloEtiqueta,estiloEtiqueta">
+                <p:outputLabel id="outputLabelDesde" value="Desde:" for="inputTextDesde"/>
+                <p:calendar id="inputTextDesde" value="#{repConsultaContratosBean.desde}" pattern="dd-MMMM-yyyy" 
+                            locale="es" timeZone="America/Guayaquil" readonlyInput="true" size="16"  styleClass="calendario" 
+                            required="true" requiredMessage="Fecha Desde requerida" showOn="button" autocomplete="off"
+                            validator="#{repConsultaContratosBean.validateFechas}">
+                    <p:ajax event="dateSelect" update="@parent"  listener="#{repConsultaContratosBean.resetFecha('hasta')}"/>
+                </p:calendar>
+                <p:message for="inputTextDesde"   display="icon" />
+                <p:outputLabel id="outputLabelHasta" value="Hasta:" for="inputTextHasta"/>
+                <p:calendar id="inputTextHasta" value="#{repConsultaContratosBean.hasta}" pattern="dd-MMMM-yyyy" 
+                            locale="es" timeZone="America/Guayaquil" readonlyInput="true" size="16"  styleClass="calendario" 
+                            required="true" requiredMessage="Fecha Hasta requerida" showOn="button" autocomplete="off"
+                            validator="#{repConsultaContratosBean.validateFechas}">
+                    <f:attribute name="fechaInicio" value="#{repConsultaContratosBean.desde}" />
+                    <p:ajax event="dateSelect" update="@parent :formLogin:growlLogin"/>
+                </p:calendar>
+                <p:message for="inputTextHasta"   display="icon" />
+                <p:outputLabel id="outputLabelRol" value="Rol:" for="selectOneMenuRol"/>
+                <p:selectOneMenu id="selectOneMenuRol" value="#{repConsultaContratosBean.rol}"  panelStyleClass="estiloPanelelectOneMenuRol" styleClass="estiloOneMenuAprob"
+                                 required="true" requiredMessage="Rol requerido" >  
+                    <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}" noSelectionOption="true"/>                        
+                    <f:selectItems value="#{repConsultaContratosBean.listaRoles}" var="rol" itemValue="#{rol.rdoCodigo}" itemLabel="#{rol.rdoDescripcion}"/> 
+                      <p:ajax event="select" />
+                </p:selectOneMenu>  
+                <p:message for="selectOneMenuRol"   display="icon" />
+                <p:outputLabel  value="Formato:"/>
+                <p:selectOneRadio id="formato" value="#{repConsultaContratosBean.formatoReporte}" styleClass="estiloEtiqueta" style="color: brown">                           
+                    <f:selectItem itemLabel="PDF" itemValue="pdf"/>
+                    <f:selectItem itemLabel="Excel" itemValue="vnd.ms-excel"/>
+                    <p:ajax event="click" update=":outputPanelPDF" listener="#{repConsultaContratosBean.resetPanelPDF}"/>
+                </p:selectOneRadio>
+                <!--p:commandButton  id="commandButtonBuscar" icon="ui-icon-buscar ui-icon-button-conso" title="Buscar..."  value="Buscar"
+                                  actionListener="#{repConsultaContratosBean.imprimirButton_processAction}" update="@parent :formLogin:growlLogin :outputPanelPDF">
+                </p:commandButton--> 
+                <p:commandButton  id="commandButtonBuscar" icon="ui-icon-buscar ui-icon-button-conso" title="Buscar..."  
+                    value="Buscar" ajax="#{repConsultaContratosBean.formatoReporte eq 'pdf'}"
+                                 actionListener="#{repConsultaContratosBean.imprimirButton_processAction}" update="@parent :formLogin:growlLogin :outputPanelPDF">
+                    <p:fileDownload id="fileDownloadBuscar" value="#{repConsultaContratosBean.contenido}"  rendered="#{repConsultaContratosBean.formatoReporte eq 'vnd.ms-excel'}"/>
+                </p:commandButton> 
+            </p:panelGrid>
+        </h:form> 
+        <p:outputPanel id="outputPanelPDF" style="width: 99%">
+            <p:media id="visorPdf" width="100%" height="500" player="pdf" value="/delay.xhtml" 
+                     rendered="#{repConsultaContratosBean.repVisible and repConsultaContratosBean.formatoReporte eq 'pdf'}"> 
+                <f:param name="#zoom" value="75"/>  
+                <div align="center" style="padding-top: 100px;">
+                    <h:outputLabel value="Su explorador no soporta desplegar archivos en PDF" style="font-size: 14pt;"/><br/>
+                    <h:outputLink style="color:blue;font-size: 14pt;">Click Aqui</h:outputLink><br/>
+                    <h:outputLabel value="para Descargar el archivo." style="font-size: 14pt;"/>  
+                </div>
+            </p:media>  
+            <!--h:panelGroup rendered="#{repConsultaContratosBean.repVisible and repConsultaContratosBean.formatoReporte eq 'vnd.ms-excel'}">
+                <div align="center" style="padding-top: 100px;">
+                    <h:outputLabel value="Archivo en formato MSExcel" style="font-size: 14pt;"/><br/><br/>
+                    <h:outputLink style="color:blue;font-size: 14pt;" value="#{facesContext.externalContext.requestScheme}://#{facesContext.externalContext.requestServerName}:#{facesContext.externalContext.requestServerPort}/ServletImpresionNew/servlet?#{sessionScope.urlRep}">Click Aqui</h:outputLink><br/><br/>
+                    <h:outputLabel value="para descargar el archivo." style="font-size: 14pt;"/><br/><br/>
+                    <h:outputLabel value="Esto puede tardar algunos minutos..." style="font-size: 14pt;"/>  
+                </div>
+            </h:panelGroup-->  
+        </p:outputPanel>
+    </p:panel>
+</ui:composition>
+

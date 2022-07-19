@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <link rel="shortcut icon" href="#{request.contextPath}/resources/layout/img/logo.ico" type="image/x-icon"></link>
+            <link rel="icon" href="#{request.contextPath}/resources/layout/img/logo.ico" type="image/x-icon"></link>
+        </f:facet>      
+        <title>Sistema Informático UASB</title>
+    </h:head>
+    <h:body>
+        <div class="container_">
+            <div class="header">
+                <div class="top-header">
+                    <div class="mail-contact">
+                        <i class="far fa-envelope-open"></i>
+                        <span>portalgestionadministrativa@uasb.edu.ec</span>
+                    </div>
+                    <div class="phone-contact">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>(593 2) 322 8085 - 299 3600</span>
+                    </div>
+                    <div class="network-contact">
+                        <a target="_blank" href="https://www.facebook.com/uasbecuador/" class="p-mr-2">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a target="_blank" href="https://twitter.com/uasbecuador" class="p-mr-2">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a target="_blank" href="https://www.instagram.com/uasbecuador" class="p-mr-2">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a target="_blank" href="https://www.linkedin.com/uasbecuador" class="p-mr-2">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a> 
+                    </div>
+                </div>
+                <div class="bottom-header">
+                    <div class="logo">
+                        <h:graphicImage name="img/logo.png" library="layout" class="img-logo"/>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="name-app">
+                        <span>PORTAL</span>
+                        <span class="name-bold">GESTIÓN ADMINISTRATIVA</span>
+                    </div>                   
+                </div>
+            </div>
+            <div class="content_">
+                <div class="login-box">
+                    <div class="login-header">
+                        <span>
+                            Bienvenido al <b>Portal Gestión Administrativa</b> de la Universidad
+                            Andina Simón Bolívar Sede Ecuador, un espacio donde
+                            podrá encontrar información y servicios de su interés.
+                        </span>
+                    </div>
+                    <div class="login-content">                        
+                        <h:form id="frmLogin" class="form-login">
+                            <p:growl id="growlLogin"/>
+                            <div class="input-field">                               
+                                <i class="material-icons prefix" style="font-size: 24px">person_outline</i>
+                                <h:inputText id="usuario" value="#{loginMgmtBean.userName}" required="true" requiredMessage="Usuario requerido"/>
+                                <label for="frmLogin:usuario" >USUARIO</label> 
+                            </div>
+
+                            <div class="input-field">                                
+                                <i class="material-icons prefix" style="font-size: 24px">lock</i>
+                                <h:inputSecret id="password" value="#{loginMgmtBean.password}" required="true" requiredMessage="Contraseña requerida"/>
+                                <label for="frmLogin:password">CONTRASEÑA</label>
+                            </div>
+                            <div class="input-help">
+                                <div class="recuerdame">
+                                    <!--<h:selectBooleanCheckbox value = "" />-->
+                                    <span></span>
+                                </div>
+                                <div class="recuperar">
+                                     <h:outputLink value="#" title="Haga click aquí si ha olvidado su usuario o su contraseña"
+                                        onclick="return open_win('https://sistemas.uasb.edu.ec/ForgotUser', 'v5');">
+                                         <i class="zmdi zmdi-help"></i>
+                                        <span>Olvidé mis credenciales</span>
+                                    </h:outputLink>        
+                                </div>
+                            </div>
+                            <div class="button-login">
+                                <h:commandButton value="Ingresar" action="#{loginMgmtBean.login(subsist)}">
+                                    <f:ajax execute="@form" render="@form growlLogin" />
+                                </h:commandButton>
+                            </div>
+                        </h:form>
+                    </div>                    
+                </div>
+            </div>
+            <div class="footer">
+                <div class="copyright">
+                    &#169;Todos los derechos reservados. Universidad Andina Simón Bolívar 2021
+                </div>
+               
+            </div>
+        </div>
+        <h:outputScript library="js" name="principal.js" target="head"/>
+        <h:outputScript name="js/materialize.min.js" library="layout" />        
+        <h:outputStylesheet name="css/materialize.css" library="layout" />          
+        <h:outputStylesheet name="css/fontawesome.css" library="layout" />
+        <h:outputStylesheet name="css/layout.css" library="layout" />
+        <h:outputStylesheet name="css/material-design-iconic-font.css" library="layout" />
+    </h:body>
+</html>

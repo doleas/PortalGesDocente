@@ -1,0 +1,57 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <style>
+        .ui-panelgrid-blankForm.form-group tbody td, .ui-panelgrid-blankForm.form-group tbody tr {border-style: none;background: transparent;font-size: 12px}
+        .ui-widget-content.fileupload-content {visibility: visible;position: relative;left: 8em; top: -3em;border: none;background-color: transparent}
+        .ui-fileupload{height: 35px}
+        .files{margin: 5px 0}
+        .fileupload-buttonbar{width: 0px;border: none;padding: 0 0}
+        .colArchivo1{width: 210px; text-align: right}
+        .colorLabel{font-weight: bold}
+        .size{display: none;}
+    </style>
+        <p:panel  id="panelMant"  style="border-width: thin;width: 850px;background-color: floralwhite;text-transform: uppercase;color: brown" 
+                  header="Ingreso de Credenciales de Firma Electrónica" >
+        <p:outputLabel value="Contrato a firmar de: &lt;span style='color:red'&gt;#{firmaContratoBean.contratoSelected.contratado.nombresApellidos}&lt;/span&gt;" 
+                       escape="false" style="text-transform: uppercase; color: blue;" styleClass="colorLabel"/><br/><br/>
+        <p:panelGrid columns="1" styleClass="ui-panelgrid-blankForm form-group">
+            <p:panelGrid columns="2"  columnClasses="colArchivo1">
+                <p:outputLabel  value="Ingrese Archivo de Firma Electrónica" style="color:darkblue;" styleClass="colorLabel"/>
+                <p:fileUpload id="fileUploadPC12" fileUploadListener="#{firmaContratoBean.subirAchivo}" mode="advance" 
+                              update="firma pnlClave commandButtonGrabar" 
+                              disabled="#{firmaContratoBean.fileFirma ne null ? 'true': 'false'}"
+                              auto="true" style="font-size: 11px;width: 100%" styleClass="colorLabel" 
+                              invalidFileMessage="No es un archivo de firma electrónica"
+                              label="Buscar..." allowTypes="/(\.|\/)(pfx|p12)$/" widgetVar="widgetVarPC12"/>
+            </p:panelGrid>
+            <p:panelGrid id="pnlClave" columns="3"  columnClasses="colArchivo1" >
+                <p:outputLabel for="claveFirma" value="Clave de Firma Electrónica: " styleClass="colorLabel" 
+                               style="color:darkblue; opacity: #{firmaContratoBean.fileFirma eq null ? 0.25:1.0}"/>
+                <p:password id="claveFirma" value="#{firmaContratoBean.clavefirma}" autocomplete="off" 
+                            disabled="#{firmaContratoBean.fileFirma eq null}" style="width: 200px"
+                            required="true" requiredMessage="Clave de Firma Electrónica necesaria"/>
+                <p:message for="claveFirma"/>
+            </p:panelGrid>
+            <p:outputLabel  id="firma" value="&lt;span style='color:blue'&gt;Archivo seleccionado: &lt;/span&gt; #{firmaContratoBean.fileFirma.fileName}" escape="false"
+                            style="visibility:  #{firmaContratoBean.fileFirma eq null ? 'hidden': 'visible'};width: 100%; color: green" styleClass="colorLabel"/>
+        </p:panelGrid>
+
+        <h:panelGroup>
+            <div align="right" style="margin-top: 5px;">
+                <p:commandButton  id="commandButtonGrabar" value="Guardar" icon="ui-icon-disk" title="Guardar datos ingresados" partialSubmit="true"
+                                  disabled="#{firmaContratoBean.fileFirma eq null}"
+                                  update=":formLogin:growlLogin @form" actionListener="#{firmaContratoBean.guardarButton_processAction}" process="@form" />
+                <span style="padding-right: 10px;"/>
+                <p:commandButton  value="Cancelar" icon="ui-icon-cancel" title="Cancelar registro" process="@this"
+                                  actionListener="#{firmaContratoBean.cancelarButton_processAction(ae)}" onclick="mantWidget.hide();widgetContrato.unselectAllRows();"/>
+            </div>
+        </h:panelGroup>
+
+    </p:panel>
+</ui:composition>

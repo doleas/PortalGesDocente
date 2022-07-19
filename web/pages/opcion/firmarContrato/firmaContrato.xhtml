@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <p:panel id="pnlContent" styleClass="myPanelHoja" header="#{firmaContratoBean.navigationJSFManagedBean.nombreOpcion}">
+        <style>
+            .calendario .ui-inputfield {font-size: 8pt;text-transform: uppercase;text-align: center;}
+            .estiloPanelelectOneMenu .ui-selectonemenu-list,.ui-selectonemenu-table tr {font-size: 9pt;border-color: transparent;text-transform: uppercase}
+            .estiloSelectOneMenu {font-size: 9pt;text-transform: uppercase;}
+            .ui-icon.ui-icon-pencil {background-image: url("#{resource['images/User-Ok.png']}") !important;  background-repeat:inherit;}
+            .ui-state-default .ui-icon-refrescar {background-image: url("#{resource['/images/refresh.png'] }");background-size: 18px 18px;}
+        </style>
+        <h:form id="formSolic">
+            <h:panelGrid id="pnlRango" columns="2" cellpadding="5" cellspacing="0">
+
+                <h:panelGrid columns="14" cellpadding="3" cellspacing="0">
+                     <p:outputLabel id="outputLabelRango" value="Consulta por fechas de solicitud del área" 
+                                    style="font-weight: bold;color: brown; text-decoration: underline "/>
+                    <p:outputLabel id="outputLabelDesde" value="Desde:" style="font-weight: bold;color: blue" for="inputTextDesde"/>
+                    <p:calendar id="inputTextDesde" value="#{firmaContratoBean.desde}" pattern="dd-MMMM-yyyy" 
+                                locale="es" timeZone="America/Guayaquil" readonlyInput="true" size="16"  styleClass="calendario" 
+                                required="true" requiredMessage="Fecha Desde requerida" showOn="button" autocomplete="off"
+                                validator="#{firmaContratoBean.validateFechas}">
+                        <p:ajax event="dateSelect" update="pnlRango"  listener="#{firmaContratoBean.resetCampo('fecha')}"/>
+                    </p:calendar>
+                    <p:message for="inputTextDesde"  display="icon" />  
+                    <p:spacer width="10"/>
+                    <p:outputLabel id="outputLabelHasta" value="Hasta:" style="font-weight: bold;color: blue" for="inputTextHasta"/>
+                    <p:calendar id="inputTextHasta" value="#{firmaContratoBean.hasta}" pattern="dd-MMMM-yyyy" 
+                                locale="es" timeZone="America/Guayaquil" readonlyInput="true" size="16"  styleClass="calendario" 
+                                required="true" requiredMessage="Fecha Hasta requerida" showOn="button" autocomplete="off"
+                                validator="#{firmaContratoBean.validateFechas}">
+                        <f:attribute name="fechaInicio" value="#{firmaContratoBean.desde}" />
+                        <p:ajax event="dateSelect" update="pnlRango :formLogin:growlLogin"/>
+                    </p:calendar>
+                    <p:message for="inputTextHasta"   display="icon" />  
+                    <p:spacer width="10"/>
+                    <p:selectOneMenu id="selectOneSolic" value="#{firmaContratoBean.estado}"  styleClass="estiloSelectOneMenu"
+                                     panelStyleClass="estiloPanelelectOneMenu" style=" width: 200px;">  
+                        <f:selectItem itemValue="T"  itemLabel="Todos los contratos"/>
+                        <f:selectItem itemValue="P"  itemLabel="Pendientes de Firma"/>
+                        <!--f:selectItem itemValue="#{firmaContratoBean.estadoAprob}"  itemLabel="Firmadas"/-->
+                        <p:ajax update=":formSolic:dataContrato"  listener="#{firmaContratoBean.buscarButton_processAction}" oncomplete="widgetContrato.unselectAllRows();"/>    
+                    </p:selectOneMenu>   
+                    <p:spacer width="10"/>
+                    <p:commandButton value="Buscar" icon="ui-icon-refrescar" title="Buscar solicitudes" id="btnBuscar" disabled="#{firmaContratoBean.disabledBuscar}"
+                                     action="#{firmaContratoBean.buscarButton_processAction}" update=":formSolic:dataContrato" 
+                                     oncomplete="widgetContrato.unselectAllRows();"/>
+                </h:panelGrid>   
+            </h:panelGrid>
+            <p:dataTable id="dataContrato" var="contratos" value="#{firmaContratoBean.contratosDocentes}" 
+                         rowIndexVar="rowIndex" selectionMode="single" styleClass="evalFormStyle"  widgetVar="widgetContrato"
+                         selection="#{firmaContratoBean.contratoSelected}" rowKey="#{contrato.fila}"  
+                         emptyMessage="No existen solicitudes en este período.">
+                <p:columnGroup type="header">  
+                    <p:row>  
+                        <p:column headerText="Nro. Solic." width="6%" />
+                        <p:column headerText="Nombres y Apellidos"  width="26%" />  
+                        <p:column headerText="Activ. Acad."  width="8%"/>  
+                        <p:column headerText="Solicitud"  width="9%"/>  
+                        <p:column headerText="Monto"  width="6%"/> 
+                        <p:column headerText="Nro. Contrato"  width="5%"/>
+                        <p:column headerText="Fecha Solicitud de Procuraduría"  width="8%" />  
+                        <p:column headerText="Firma Rector"  width="8%"/>
+                        <p:column headerText="Fecha firma Rector"  width="8%" />  
+                        <p:column headerText="Firma Docente"  width="8%"/>
+                        <p:column headerText="Fecha firma Docente"  width="8%" />  
+                    </p:row>  
+                </p:columnGroup>    
+                <p:subTable id="contratoTable" value="#{contratos.listaContratos}" var="contrato"  >
+                    <f:facet name="header">  
+                        <h:outputText value="#{contratos.area}" style="color: brown;font-size: 9pt;"/>
+                    </f:facet>    
+                    <p:column headerText="Nro."  style="text-align: center" >  
+                        <span style="font-weight: bold">#{contrato.cdoCodigo}</span>
+                    </p:column>                      
+                    <p:column headerText="Nombres y Apellidos" >   
+                        <p:outputLabel value="#{contrato.contratado.nombresApellidos}" title="#{contrato.contratado.dniprs}"/>
+                    </p:column>    
+                    <p:column headerText="Activ. Acad." style="text-align: center" >   
+                        #{contrato.rolDocente.rdoDescripcion}
+                    </p:column>     
+                    <p:column headerText="Solicitud" style="text-align: center" >   
+                        <h:outputText value="#{contrato.cdoFechaCrea}" style="color: darkblue" >
+                            <f:convertDateTime pattern="dd MMM yyyy"  locale="es_EC" timeZone="America/Guayaquil"/>
+                        </h:outputText>                       
+                    </p:column>  
+                    <p:column headerText="Monto" style="text-align: center" >   
+                        <h:outputText value="#{contrato.cdoMonto}" >
+                            <f:convertNumber pattern="$ #,##0.00" currencySymbol="$" locale="es_EC" />
+                        </h:outputText>                    
+                    </p:column>            
+                    <p:column headerText="Nro. Contrato"  style="text-align: center" >
+                        <p:outputLabel value="#{contrato.cdoNumero}" style="font-weight: bold;color: darkblue"/> 
+                    </p:column>
+                    <p:column headerText="Fecha de Procuraduría" style="text-align: center" >   
+                        <h:outputText value="#{contrato.cdoFechaListoFirma}" style="color: darkblue" >
+                            <f:convertDateTime pattern="dd MMM yyyy"  locale="es_EC" timeZone="America/Guayaquil"/>
+                        </h:outputText>                       
+                    </p:column>  
+                    <p:column headerText="Firma Rector"  style="text-align: center" >  
+                        <h:outputText value="Firmado" style="color: green;font-size: 9pt;font-weight: bold"  rendered="#{contrato.cdoFechaFirmaRector ne null}"/>
+                        <div align="center">
+                            <p:commandLink value="Por Firmar" title="Firmar contrato" immediate="true"  
+                                           style="color:red;font-size: 9pt;font-weight:bold;"
+                                           partialSubmit="true" actionListener="#{firmaContratoBean.editarButton_processAction}" 
+                                           onstart="widgetContrato.unselectAllRows();"   oncomplete="mantWidget.show();"
+                                           update=":mantDialog" rendered="#{contrato.cdoFechaFirmaRector eq null}">
+                                <f:attribute value="#{contrato}" name="contrato" /> 
+                            </p:commandLink>                
+                        </div>
+                    </p:column> 
+                    <p:column headerText="Fecha" style="text-align: center" >   
+                        <h:outputText value="#{contrato.cdoFechaFirmaRector}" style="color: darkblue" >
+                            <f:convertDateTime pattern="dd MMM yyyy"  locale="es_EC" timeZone="America/Guayaquil"/>
+                        </h:outputText>                       
+                    </p:column> 
+                    <p:column headerText="Firma Docente" style="text-align: center" >   
+                        <h:outputText value="#{contrato.cdoFechaFirmaDocente eq null ? 'Pendiente':'Firmado'}" rendered="#{contrato.cdoFechaFirmaRector ne null}"
+                                      style="font-size: 9pt;font-weight:bold;color:#{contrato.cdoFechaFirmaDocente eq null ? 'red':'green'}"/>  
+                    </p:column>     
+                    <p:column headerText="Fecha" style="text-align: center" >   
+                        <h:outputText value="#{contrato.cdoFechaFirmaDocente}" style="color: darkblue" >
+                            <f:convertDateTime pattern="dd MMM yyyy"  locale="es_EC" timeZone="America/Guayaquil"/>
+                        </h:outputText>                       
+                    </p:column> 
+                </p:subTable>
+            </p:dataTable>
+        </h:form> 
+    </p:panel>
+</ui:composition>
+

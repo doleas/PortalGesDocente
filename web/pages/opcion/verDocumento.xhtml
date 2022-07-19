@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 xmlns:f="http://java.sun.com/jsf/core" xmlns:pe="http://primefaces.org/ui/extensions" 
+                 xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <style>
+        .ui-panel .ui-panel-titlebar{color:brown;font-size: 14pt}
+    </style>
+    <p:panel id="panelMant"  style="width: 1024px;" header="CONTRATO FIRMADO POR LAS PARTES" >
+        <p:media id="visorPdf" width="100%" height="500" player="pdf" value="/printPDFPreview"> 
+            <f:param name="#zoom" value="75"/>  
+            <div align="center" style="padding-top: 100px;">
+                <h:outputLabel value="Su explorador no soporta desplegar archivos en PDF" style="font-size: 14pt;"/><br/>
+                <h:outputLink style="color:blue;font-size: 14pt;" value="xx">Click Aqui</h:outputLink><br/>
+                <h:outputLabel value="para Descargar el archivo." style="font-size: 14pt;"/>  
+            </div>
+        </p:media>  
+    </p:panel>
+    <h:panelGroup>
+        <div align="right" style="margin-top: 5px;">
+            <p:commandButton  value="Cerrar" icon="ui-icon-cancel" process="@this"  onclick="mantWidget.hide();"/>
+        </div>
+    </h:panelGroup>
+</ui:composition>
+
