@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 xmlns:f="http://java.sun.com/jsf/core">
+
+    <p:panel id="pnlContent" styleClass="myPanelHoja" header="#{regactabean.navigationJSFManagedBean.nombreOpcion}">
+        <style>
+            .red{color: red;}
+            .black{color: black;}
+            .ui-fieldset .ui-fieldset-legend{color: #FF0000;font-size: 8pt;}
+            .ui-icon.ui-confirm-dialog-severity.ui-icon-alert {background-position: 0 0 !important; width: 40px;height: 40px; background-image: url('#{resource['/images/trash-delete.png']}') !important;}            
+            .ui-state-default .ui-icon-refrescar {background-image: url("#{resource['/images/refresh.png'] }");background-size: 18px 18px;}
+            .ui-confirmdialog-yes{ font-size: 9pt;}  
+            .tablaSilabo {font-size: 7pt }
+            .mod-boxCopia {color: transparent;}   
+        </style>
+        <p:notificationBar id="notificationBarSyl" position="top" effect="slide" widgetVar="bar" styleClass="ui-notificationbarTop" 
+                           style="display:#{regactabean.sylabusPendientes?'block':'none'};">  
+            <h:outputText value="#{regactabean.msgNotificacion}"/>  
+        </p:notificationBar> 
+        <h:form id="formAsignaturas">
+            <h:panelGrid id="pnlCiclo" columns="5" cellpadding="5" cellspacing="0">
+                <p:outputLabel id="outputLabelCiclo" value="Ciclo Académico:" style="font-weight: bold;color: blue" for="selectOneMenuCiclo"/>
+                <p:selectOneMenu id="selectOneMenuCiclo" value="#{regactabean.anio}" style="width: 210px" 
+                                 requiredMessage="Seleccione un Ciclo Académico" required="true">  
+                    <f:selectItem itemValue="" itemLabel="Seleccione ..." noSelectionOption="true" />                        
+                    <f:selectItems value="#{regactabean.ciclos}"  var="ciclo" itemValue="#{ciclo.anio}"
+                                   itemLabel="#{ciclo.nombreCiclo}" itemDescription="#{ciclo.nombreCiclo}"/>
+                    <p:ajax update="outputLabelCiclo"/>                 
+                </p:selectOneMenu>
+                <p:outputLabel id="outputLabelArea" value="Área:" style="font-weight: bold;color: blue" for="selectOneMenuArea"/>
+                <p:selectOneMenu id="selectOneMenuArea" value="#{regactabean.smarea}" style="width: 210px" 
+                                 requiredMessage="Seleccione el área" required="true">  
+                    <f:selectItem itemValue="" itemLabel="Seleccione ..." noSelectionOption="true" />
+                    <f:selectItem  itemLabel="Todas" itemValue="T" />
+                    <f:selectItems  value="#{regactabean.listaAreas}" var="larea" itemLabel="#{larea.nombreArea}" itemValue="#{larea.areCodigo}"  
+                                    itemDescription="#{larea.areCodigo.toString()}"/>                               
+                    <p:ajax update=":formAsignaturas:dataAsig outputLabelArea pnlCiclo"   listener="#{regactabean.handleCicloChange}" />                 
+                </p:selectOneMenu>
+                <p:commandButton   icon="ui-icon-refrescar" title="Refrescar registros"   immediate="true" update=":formAsignaturas:dataAsig" 
+                                   actionListener="#{regactabean.handleCicloChange}"/>     
+            </h:panelGrid>              
+            <p:dataTable id="dataAsig" var="coordprog" value="#{regactabean.listProgramas}"  widgetVar="asigWidgetVar"
+                         rowIndexVar="rowIndex" selectionMode="single" styleClass="evalFormStyle" 
+                         selection="#{regactabean.programaSelected}" rows="10" paginatorPosition="top"
+                         rowKey="#{coordprog.coordinadorProgramaPK.codigoEsp}"  
+                         emptyMessage="No existen programas disponibles ! Por favor consulte con su secretaria de área">
+                <p:column headerText="Ord." style="text-align: center;" width="3%">  
+                    <span style="font-weight: bold">#{rowIndex+1}</span>
+                </p:column>             
+                <p:column headerText="Programa"  width="30%" style="text-transform: uppercase">   
+                    #{coordprog.coordinadorProgramaPK.codigoEsp} - #{coordprog.nombrePrograma}
+                </p:column>                  
+                <p:column headerText="N° Paralelos" style="text-align: center" width="3%">  
+                    #{coordprog.numParalelos}
+                </p:column>  
+                <p:column headerText="Coordinador"  style="text-align: center"  width="11%">
+                    <!-- Se agrego un nuevo estado, por lo que se creo una nueva expresión EL para validar dicho estado MV-->
+                    <h:outputText value="#{coordprog.apellidoCoordinador} #{coordprog.nombreCoordinador}" />  
+                </p:column>                   
+                <p:column headerText="N° Acta" style="text-align: center"  width="10%" >   
+                    <div>
+                        
+                    </div>
+                </p:column>  
+                <p:column headerText="Estado"  style="text-align: center"  width="8%">
+                    Pendiente
+                </p:column>                 
+                <p:column headerText="Editar"  style="text-align: center"  width="4%">  
+                    <p:commandButton id="editarSylabusButton"  icon="ui-icon-pencil" title="Editar"  update="dataAsig :mantDialog"
+                                     action="#{regactabean.editarActa_processAction}" 
+                                     onstart="blockUIContentenidoWidget.block()" oncomplete="blockUIContentenidoWidget.unblock();mantWidget.show();">  
+                        <f:setPropertyActionListener value="#{coordprog}" target="#{regactabean.programaSelected}" />  
+                    </p:commandButton>
+                </p:column>    
+                <p:column headerText="PDF Acta"  style="text-align: center"  width="4%">  
+                    <p:commandButton id="selectButton"  icon="ui-icon-search" title="Ver Acta"  update="dataAsig :pdfDialog"
+                                     action="#{regactabean.imprimirSp}"  oncomplete="pdfWidget.show();">  
+                        <f:setPropertyActionListener value="#{coordprog}" target="#{regactabean.programaSelected}" />  
+                    </p:commandButton>
+                </p:column>                   
+            </p:dataTable>
+        </h:form> 
+          
+    </p:panel>
+
+</ui:composition>
+

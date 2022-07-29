@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 xmlns:f="http://java.sun.com/jsf/core" xmlns:pe="http://primefaces.org/ui/extensions" >
+    <style>
+        ·.tab_hidden{display:none !important;}
+        .ui-spinner-input{ width: 50px;}
+        .colorCounter{color: brown;font-weight: bold;font-size: 8pt}
+        .ui-dialog .ui-dialog-buttonpane{text-align: center;margin: 0 0;background-color: #F5F5DC;}
+        .ui-dialog .ui-dialog-titlebar{color: brown;}
+        .ui-confirm-dialog .ui-dialog-content p span { background-image: url("#{resource['primefaces:editor/images/toolbar.gif']}") no-repeat}
+        .ui-tabs .ui-tabs-panel{padding: 0.5em;}
+        .myPanelSylabus{border-style: outset; height: 450px;width: 100%;background-color: oldlace;}
+        .myPanelSylabus .ui-panel-title{color:brown;}
+        .titulosVistaPrevia{font-weight: bold;color: brown;font-size: 9pt;}
+        .ui-state-default .ui-icon-enviar {background-image: url("#{resource['/images/email.png']}");}
+        #cke_bottom_detail,.cke_bottom{display:none}
+        .panelMant .ui-panel-content{padding: 0px 0px;}
+        .col1InfoGen{width: 185px;font-weight: bold;color: black;border: 1px solid #a8a8a8}
+        .col2InfoGen{width: 600px;border: 1px solid #a8a8a8}
+        .colObserv{width: #{regSyllabusBean.sylabusDocente.estadoEnvio eq 'P'? regSyllabusBean.sylabusDocente.observacionCoordinador eq null? '950px':'73%':'950px'};font-size: 9pt;color: red;font-weight: bold;padding-left: 20px}        
+    </style>
+    <p:panel id="panelMant"  style="border:none;background-color: transparent;" styleClass="panelMant">
+        <p:tabView id="tabView" dynamic="true" 
+                   style="width: 1050px;height: 550px;background-color: #F5F5DC;padding: 0px 0px;" activeIndex="#{regactabean.activeTabIndex}">
+            <p:ajax event="tabChange" listener="#{regactabean.onTabChange(event)}" 
+                    update=":formMant:commandButtonGrabar :formMant:cmdBtnEnviar :formMant:tabView:tabViewArtic :formMant:tabView:tabViewBiblio :formMant:tabView:tabViewProdDoc :formMant:tabView:tabViewEval :formMant:tabView:preview"/>  
+            <!-- :formMant:tabView:tabViewArtic--> 
+            <p:tab id="tab1" title="1. Info. general" titletip="Información general" >
+                <p:panel id="panelDescrip" header="1. INFORMACION GENERAL DEL ACTA" styleClass="myPanelSylabus">  
+                    <p:focus context="panelDescrip" />  <br/>          
+                    <h:panelGrid  columns="2" cellpadding="5" cellspacing="0" columnClasses="col1InfoGen,col2InfoGen" >
+                        <p:outputLabel value="Área académica:" />
+                        <h:outputText value="#{regactabean.programaSelected.areNombre}" /> 
+                        <p:outputLabel value="Anio académico:" />
+                        <h:outputText value="#{regactabean.programaSelected.anio}" />    
+                        <p:outputLabel value="Programa: " />
+                        <h:outputText style="text-transform: uppercase" value="#{regactabean.programaSelected.nombrePrograma}" />  
+                        <p:outputLabel value="Acta N°: " style=""/>
+                        <h:outputText style="text-transform: uppercase" value="1"/>
+                    </h:panelGrid> <br/><br/>                
+                    <h:outputText  value="Participantes *" style="font-weight: bold" />
+                    <h:panelGrid columns="3" id="pgactapart">
+                        <p:inputTextarea binding="#{regactabean.itxtactapart}" 
+                                         id="itxtactapart" style=" width: 250px; height: 48px; text-transform: uppercase"
+                                         rows="1" cols="40" maxlength="500" 
+                                         required="true" requiredMessage="Acta Comité/Participantes: se requiere un valor" >
+                            <p:ajax  update="pgactapart" immediate="true" /> 
+                        </p:inputTextarea>
+                        <p:message for="itxtactapart" display="icon"/>
+                    </h:panelGrid>
+                    <h:outputText  value="Hora inicio *" style="font-weight: bold"/>
+                    <h:panelGrid columns="2" id="pghoraactaini">
+                        <pe:timePicker id="tpkhoraini" value="#{regactabean.thoraactaini}" timeSeparator=":" startHours="8" endHours="19"
+                                       startMinutes="00" endMinutes="59" intervalMinutes="15" showCloseButton="false" locale="es" mode="popup"
+                                       showDeselectButton="false" showNowButton="false" rows="3" showPeriod="false" />
+                    </h:panelGrid>
+                    <h:outputText  value="Hora fin*" style="font-weight: bold"/>
+                    <h:panelGrid columns="2" id="pghoraactafin">
+                        <pe:timePicker id="tpkhorafin" value="#{regactabean.thoraactafin}" timeSeparator=":" startHours="8" endHours="19"
+                                       startMinutes="00" endMinutes="59" intervalMinutes="15" showCloseButton="false" locale="es" mode="popup"
+                                       showDeselectButton="false" showNowButton="false" rows="3" showPeriod="false" />
+                    </h:panelGrid>
+                </p:panel>  
+            </p:tab>     
+            <p:tab id="tab2" title="2. Desarrollo"  titletip=" Desarrollo, aspectos académicos y administrativos">
+                <p:panel id="panelDesarrollo" header="2. ORDEN DEL DÍA" styleClass="myPanelSylabus">  
+                    <p:focus context="panelDesarrollo" />  <br/>          
+                    <h:outputText  value="Aspectos académicos *" style="font-weight: bold" />
+                    <h:panelGrid columns="3" id="pgactaaspacad">
+                        <p:inputTextarea binding="#{regactabean.itxtactaspacad}" 
+                                         id="itxtactaspacad" style=" width: 250px; height: 48px; text-transform: uppercase"
+                                         rows="1" cols="40" maxlength="500" 
+                                         required="true" requiredMessage="Acta Comité/Participantes: se requiere un valor" >
+                            <p:ajax  update="pgactaaspacad" immediate="true" /> 
+                        </p:inputTextarea>
+                        <p:message for="itxtactaspacad" display="icon"/>
+                    </h:panelGrid>
+                    <h:outputText  value="Solicitudes de estudiantes *" style="font-weight: bold" />
+                    <h:panelGrid columns="3" id="pgactasolest">
+                        <p:inputTextarea binding="#{regactabean.itxtactasolest}" 
+                                         id="itxtactasolest" style=" width: 250px; height: 48px; text-transform: uppercase"
+                                         rows="1" cols="40" maxlength="500" 
+                                         required="true" requiredMessage="Acta Comité/Participantes: se requiere un valor" >
+                            <p:ajax  update="pgactasolest" immediate="true" /> 
+                        </p:inputTextarea>
+                        <p:message for="itxtactasolest" display="icon"/>
+                    </h:panelGrid>
+                    <h:outputText  value="Aspectos administrativos y de servicios *" style="font-weight: bold" />
+                    <h:panelGrid columns="3" id="pgactaaspadm">
+                        <p:inputTextarea binding="#{regactabean.itxtactaaspadm}" 
+                                         id="itxtactaaspadm" style=" width: 250px; height: 48px; text-transform: uppercase"
+                                         rows="1" cols="40" maxlength="500" 
+                                         required="true" requiredMessage="Acta Comité/Participantes: se requiere un valor" >
+                            <p:ajax  update="pgactaaspadm" immediate="true" /> 
+                        </p:inputTextarea>
+                        <p:message for="itxtactaaspadm" display="icon"/>
+                    </h:panelGrid>
+                </p:panel>
+            </p:tab>
+            <!--Milton Creacion de listas-->
+            <p:tab id="tab3" title="3. Resoluciones"  titletip="Resoluciones del comité de postgrado">
+                <p:panel id="panelDesarrollo" header="3. RESOLUCIONES DEL COMITÉ DE POSTGRADO" styleClass="myPanelSylabus">
+                    <pe:ckEditor width="auto" height="370" value="#{regactabean.ckedtrescomite}"  
+                                 readOnly="#{regactabean.ceaActa.ceaEstado eq 'A' || regactabean.ceaActa.ceaEstado eq 'F'}" 
+                                 customConfig="#{facesContext.externalContext.requestContextPath}/resources/ckeditor_config.js"/>        
+                </p:panel>
+            </p:tab>
+            <!--Milton Cambio de nombre Contenido--> 
+            <p:tab id="tab4" title="4. Mejora Continua"  titletip="Temas de la asignatura" >  
+                <p:panel id="panelDesarrollo" header="4. MEJORA CONTINUA DEL PROGRAMA" styleClass="myPanelSylabus">
+
+                </p:panel>
+            </p:tab> 
+
+            <p:tab id="tabPreview" title="Vista previa" titletip="Vista de acta registrada" >  
+                <p:scrollPanel style="height:450px;" id="preview" mode="native">
+                    <h:panelGrid  cellpadding="5" cellspacing="10" style="text-align: justify;width:975px;">
+                        
+                        <p:outputLabel value="1. INFORMACION GENERAL DEL ACTA" styleClass="titulosVistaPrevia"/>   
+                        <h:panelGrid  columns="2" cellpadding="3" cellspacing="0" columnClasses="col1InfoGen,col2InfoGen">
+                            <p:outputLabel value="Área académica:" />
+                            <h:outputText value="#{regactabean.programaSelected.areNombre}" /> 
+                            <p:outputLabel value="Anio académico:" />
+                            <h:outputText value="#{regactabean.programaSelected.anio}" />    
+                            <p:outputLabel value="Programa: " />
+                            <h:outputText style="text-transform: uppercase" value="#{regactabean.programaSelected.nombrePrograma}" />  
+                            <p:outputLabel value="Acta N°: " style=""/>
+                            <h:outputText style="text-transform: uppercase" value="1"/>
+                        </h:panelGrid>        <br/>               
+                        <h:panelGrid  columns="2" cellpadding="5" cellspacing="0" columnClasses="col1InfoGen,col2InfoGen" >                            
+                            <h:outputText  value="Participantes *" style="font-weight: bold" />
+                            <h:outputText style="text-transform: uppercase" value="#{regactabean.itxtactapart}" />
+                            <h:outputText  value="Hora inicio *" style="font-weight: bold"/>
+                            <h:outputText value="#{regactabean.thoraactaini}" />
+                            <h:outputText  value="Hora fin*" style="font-weight: bold"/>
+                            <h:outputText value="#{regactabean.thoraactafin}" />
+                        </h:panelGrid>
+                        
+                        <p:outputLabel value="2. DESARROLLO" styleClass="titulosVistaPrevia"/>  
+                        <h:panelGrid  columns="1" cellpadding="5" cellspacing="10">          
+                            <p:outputLabel value="2.1. Aspectos académicos " styleClass="titulosVistaPrevia"/>
+                            <h:outputText value="#{regactabean.itxtactaspacad}" escape="false" />
+                            <p:outputLabel value="2.2. Solicitudes de estudiantes" styleClass="titulosVistaPrevia"/>
+                            <h:outputText value="#{regactabean.itxtactasolest}" escape="false" />
+                            <p:outputLabel value="2.3. Aspectos administrativos y de servicios" styleClass="titulosVistaPrevia"/>
+                            <h:outputText value="#{regactabean.itxtactaaspadm}" escape="false" />
+                        </h:panelGrid>
+                        
+                        <p:outputLabel value="3. RESOLUCIONES DEL COMITÉ DE POSTGRADO" styleClass="titulosVistaPrevia"/>  
+                        <h:panelGrid  columns="1" cellpadding="5" cellspacing="10"> 
+                            <p:outputLabel value="3.1. Resoluciones del comité de postgrado " styleClass="titulosVistaPrevia"/>
+                            <h:outputText value="#{regactabean.ckedtrescomite}" escape="false" />
+                        </h:panelGrid>
+                        <p:outputLabel value="4. MEJORA CONTINUA DEL PROGRAMA" styleClass="titulosVistaPrevia"/>
+
+                    </h:panelGrid>
+                </p:scrollPanel>
+            </p:tab>          
+        </p:tabView> 
+    </p:panel>
+
+    <h:panelGrid columns="2" columnClasses="colObserv">
+        <h:panelGroup id="panelEye"  rendered="#{regactabean.ceaActa.ceaEstado eq 'P' ? true : false}">
+            <h:graphicImage id="eye" name="Eye.png" library="images" width="24" height="24" style="cursor:pointer;"/> 
+            Hay Observaciones
+        </h:panelGroup>
+        <h:panelGroup id="pnlBotones" >
+            <div align="right" style="margin-top: 1px;">
+                <p:commandButton  id="cmdBtnEnviar" value="Enviar" icon="ui-icon-enviar" title="Enviar Sílabo al coordinador"  
+                                  update=":formLogin:growlLogin" 
+                                  onstart="blockUIContentenidoWidgetMant.block();document.getElementById('formMant:cmdBtnEnviar').disabled=true;document.getElementById('formMant:commandButtonCancelar').disabled=true;" 
+                                  oncomplete="blockUIContentenidoWidgetMant.unblock();document.getElementById('formMant:cmdBtnEnviar').disabled=false;document.getElementById('formMant:commandButtonCancelar').disabled=false;"
+                                  actionListener="#{regactabean.enviarButton_processAction(ae)}" process="@form" 
+                                  disabled="#{regactabean.ceaActa.ceaEstado eq 'E' or regactabean.ceaActa.ceaEstado eq 'A' or regactabean.activeTabIndex ne 6}"/>        
+                <p:commandButton  id="commandButtonGrabar" value="Guardar" icon="ui-icon-disk" title="Guardar datos ingresados"  update=":formLogin:growlLogin"
+                                  actionListener="#{regactabean.guardarButton_processAction(ae)}" process="@form" 
+                                  disabled="#{regactabean.ceaActa.ceaEstado eq 'E' or regactabean.ceaActa.ceaEstado eq 'A' or regactabean.activeTabIndex eq 6}"/>
+                <p:commandButton  id="commandButtonCancelar" value="Cancelar" icon="ui-icon-cancel" title="Cancelar registro" process="@this" update=":confirmDialogGrabar"
+                                  actionListener="#{regactabean.cancelarButton_processAction(ae)}"  onclick="mantWidget.hide();"/>
+            </div>
+        </h:panelGroup>
+    </h:panelGrid>
+    <p:tooltip for="formMant:eye" showEvent="click" >  
+        <p:panelGrid columns="1" style="opacity: 0.7;height: 175px;width: 750px;" >
+            <h:outputText value="#{regSyllabusBean.sylabusDocente.observacionCoordinador}" escape="false"/>
+        </p:panelGrid>
+
+    </p:tooltip>  
+
+    <pe:blockUI target="panelMant"  widgetVar="blockUIContentenidoWidgetMant">
+        <h:panelGrid columns="2" >  
+            <h:graphicImage library="images" name="ajax-loader1.gif"  
+                            style="margin-right: 12px; vertical-align: middle;"/>  
+            <h:outputText value="Por favor espere, los datos estan siendo procesados..." style="white-space: nowrap;"/>  
+        </h:panelGrid>    
+    </pe:blockUI> 
+</ui:composition>
+

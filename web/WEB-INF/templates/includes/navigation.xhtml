@@ -70,7 +70,8 @@
                                                 fn:containsIgnoreCase(sessionScope.perfiles,'SECRECTO') or
                                                 fn:containsIgnoreCase(sessionScope.perfiles,'VICEREC')  or
                                                 fn:containsIgnoreCase(sessionScope.perfiles,'SEC_GREC') or 
-                                                fn:containsIgnoreCase(sessionScope.perfiles,'SGENERAL')}">
+                                                fn:containsIgnoreCase(sessionScope.perfiles,'SGENERAL') or
+                                                fn:containsIgnoreCase(sessionScope.perfiles,'SEC_INS')}">
                 <h:panelGrid columns="1" cellpadding="5" cellspacing="0" rowClasses="filaClass" columnClasses="celdaClass">      
                     <p:commandLink actionListener="#{navigationMgmtBean.navigationPathChange}" immediate="true" update=":pnlContent" 
                                    value="Solicitud de Contrato" rendered="#{fn:containsIgnoreCase(sessionScope.perfiles,'USU_SIST') or
@@ -109,7 +110,14 @@
                                    rendered="#{fn:containsIgnoreCase(sessionScope.perfiles,'USU_SIST') or 
                                                fn:containsIgnoreCase(sessionScope.perfiles,'SEC_GREC')}">  
                         <f:param name="includePath" value="/pages/opcion/evaluacionTutoria/pagEstampillaAsignatura"/>
-                    </p:commandLink>    
+                    </p:commandLink> 
+                    <p:commandLink actionListener="#{navigationMgmtBean.navigationPathChange}" immediate="true" update=":pnlContent" 
+                                   value="Actas Comité" 
+                                   rendered="#{fn:containsIgnoreCase(sessionScope.perfiles,'USU_SIST') or
+                                               fn:containsIgnoreCase(sessionScope.perfiles,'SEC_AREA') or
+                                               fn:containsIgnoreCase(sessionScope.perfiles,'SEC_INS')}">  
+                        <f:param name="includePath" value="/pages/opcion/actaComite/actaComite"/>
+                    </p:commandLink>
                 </h:panelGrid>
             </p:tab>
             <p:tab title="Reportes y Consultas" rendered="#{fn:containsIgnoreCase(sessionScope.perfiles,'USU_SIST') or 
@@ -167,7 +175,7 @@
                                                                 fn:containsIgnoreCase(sessionScope.perfiles,'SEC_INS')}">  
                         <f:param name="includePath" value="/pages/tutoria/reporteTutoria"/>
                     </p:commandLink>     
-                  </h:panelGrid>
+                </h:panelGrid>
             </p:tab>                
         </p:accordionPanel>        
     </h:form>        
